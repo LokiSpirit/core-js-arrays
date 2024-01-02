@@ -21,9 +21,10 @@
  *    getIntervalArray(3, 3) => [ 3 ]
  */
 function getIntervalArray(start, end) {
-  return new Array(end - start + 1)
-    .fill(start)
-    .map((item, index) => item + index);
+  return Array.from(
+    new Array(end - start + 1).fill(start),
+    (item, index) => item + index
+  );
 }
 
 /**
@@ -39,9 +40,15 @@ function getIntervalArray(start, end) {
  *    sumArrays([10, 20, 30], [5, 10, 15]) => [15, 30, 45]
  *    sumArrays([-1, 0, 1], [1, 2, 3, 4]) => [0, 2, 4, 4]
  */
-function sumArrays(/* arr1, arr2 */) {
-  /* return arr1.map((item, index) => arr2[index] + item); */
-  throw new Error('Not implemented');
+function sumArrays(arr1, arr2) {
+  const bigger = arr1.length >= arr2.length ? arr1 : arr2;
+  const smaller = arr1 === bigger ? arr2 : arr1;
+  return bigger.map((item, index) => {
+    if (smaller[index]) {
+      return smaller[index] + item;
+    }
+    return item;
+  });
 }
 
 /**
@@ -57,7 +64,7 @@ function sumArrays(/* arr1, arr2 */) {
  *    findElement([0, 1, 2, 3, 4, 5], 5) => 5
  */
 function findElement(arr, value) {
-  return arr.findIndex((item) => item === value);
+  return arr.indexOf(value);
 }
 
 /**
@@ -127,12 +134,12 @@ function getStringsLength(arr) {
  *   getAverage([ 1, 10, 100, 1000 ])  => 277,75
  *   getAverage([ 2, 3, 3 ])  => 2,67
  */
-function getAverage(/* arr */) {
-  /* return (
+function getAverage(arr) {
+  if (arr.length === 0) return 0;
+  return (
     Math.round((arr.reduce((sum, item) => sum + item, 0) / arr.length) * 100) /
     100
-  ); */
-  throw new Error('Not implemented');
+  );
 }
 
 /**
@@ -274,8 +281,18 @@ function distinct(arr) {
  *    createNDimensionalArray(4, 2) => [[[[0, 0], [0, 0]], [[0, 0], [0, 0]]], [[[0, 0], [0, 0]], [[0, 0], [0, 0]]]]
  *    createNDimensionalArray(1, 1) => [0]
  */
-function createNDimensionalArray(/* n, size */) {
-  throw new Error('Not implemented');
+function createNDimensionalArray(n, size) {
+  let result = new Array(size).fill(0);
+  if (n === 1) return result;
+  let temp = new Array(size);
+  const auxiliary = new Array(n - 1).fill(0);
+  auxiliary.map((item) => {
+    temp.fill(result.slice(0));
+    result = temp;
+    temp = new Array(size);
+    return item;
+  });
+  return result;
 }
 
 /**
@@ -307,7 +324,7 @@ function flattenArray(nestedArray) {
  *   selectMany(['one','two','three'], (x) => x.split('')) =>   ['o','n','e','t','w','o','t','h','r','e','e']
  */
 function selectMany(arr, childrenSelector) {
-  return arr.map(childrenSelector).flat(1);
+  return arr.flatMap(childrenSelector);
 }
 
 /**
@@ -323,10 +340,8 @@ function selectMany(arr, childrenSelector) {
  *   calculateBalance([ [ 10, 8 ], [ 1, 5 ] ])  => (10 - 8) + (1 - 5) = 2 + -4 = -2
  *   calculateBalance([]) => 0
  */
-function calculateBalance(/* arr */) {
-  /* const income = arr[0];
-  const expence = arr[1].map((item) => -item);
-  return income.map((item, index) => item + expence[index]); */
+function calculateBalance(arr) {
+  return arr.reduce((res, item) => res + item[0] - item[1], 0);
 }
 
 /**
@@ -343,12 +358,15 @@ function calculateBalance(/* arr */) {
  */
 function createChunks(arr, chunkSize) {
   let mult = 0;
+  let temp;
   return arr.reduce((result, item, index) => {
     if (index < mult) {
-      result[-1].push(item);
+      temp.push(item);
     } else {
+      temp = [];
+      result.push(temp);
+      temp.push(item);
       mult += chunkSize;
-      result.push([item]);
     }
     return result;
   }, []);
